@@ -1,0 +1,36 @@
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .ant-table {
+    border-radius: 8px;
+  }
+  
+  .ant-table-thead > tr > th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+  }
+  
+  .ant-table-tbody > tr:nth-child(odd) {
+    background-color: #fafafa;
+  }
+  
+  .ant-table-tbody > tr:nth-child(even) {
+    background-color: #ffffff;
+  }
+  
+  .ant-table-tbody > tr:hover {
+    background-color: #e6f7ff;
+  }
+  
+  h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }

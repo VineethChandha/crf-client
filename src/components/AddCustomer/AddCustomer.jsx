@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Button from "../Button/Button";
-import { FaEdit, FaEye, FaTrash } from 'react-icons/fa';
 
 const AddCustomerForm = ({ onSubmit, onCancel, initialData }) => {
   const [formData, setFormData] = useState({

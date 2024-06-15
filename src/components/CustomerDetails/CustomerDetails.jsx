@@ -3,6 +3,7 @@ import { Table, Modal, Form, Input, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
 import moment from "moment";
+import Button from "../Button/Button";
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 const CustomerDetails = ({ details }) => {
@@ -101,72 +102,59 @@ const CustomerDetails = ({ details }) => {
       title: "Reward Points",
       dataIndex: "points",
       key: "points",
-    },
-    {
-      title: "Actions",
-      key: "actions",
-      render: () => (
-        <button
-          className="border p-2 rounded border-blue-500"
-          onClick={() => setIsModalVisible(true)}
-        >
-          <PlusOutlined className="mr-2" />
-          Add Reward
-        </button>
-      ),
-    },
+    }
   ];
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white shadow rounded-lg w-full">
       <div className="flex items-center">
-        <p className="text-lg font-bold">First Name:</p>
-        <p className="text-lg ml-2">{details.customer.firstName}</p>
+        <p className="text-sm font-bold">First Name:</p>
+        <p className="text-sm ml-2">{details.customer.firstName}</p>
       </div>
       <div className="flex items-center">
-        <p className="text-lg font-bold">Last Name:</p>
-        <p className="text-lg ml-2">{details.customer.lastName}</p>
+        <p className="text-sm font-bold">Last Name:</p>
+        <p className="text-sm ml-2">{details.customer.lastName}</p>
       </div>
       <div className="flex items-center">
-        <p className="text-lg font-bold">Gender:</p>
-        <p className="text-lg ml-2">{details.customer.gender}</p>
+        <p className="text-sm font-bold">Gender:</p>
+        <p className="text-sm ml-2">{details.customer.gender}</p>
       </div>
       <div className="flex items-center">
-        <p className="text-lg font-bold">Registered On:</p>
-        <p className="text-lg ml-2">
+        <p className="text-sm font-bold">Registered On:</p>
+        <p className="text-sm ml-2">
           {moment(details.createdAt).format("DD/MM/YYYY")}
         </p>
       </div>
       <div className="flex items-center">
-        <p className="text-lg font-bold">Email:</p>
-        <p className="text-lg ml-2">{details.customer.email}</p>
+        <p className="text-sm font-bold">Email:</p>
+        <p className="text-sm ml-2">{details.customer.email}</p>
       </div>
       <div className="flex items-center">
-        <p className="text-lg font-bold">Phone:</p>
-        <p className="text-lg ml-2">{details.customer.phoneNumber}</p>
+        <p className="text-sm font-bold">Phone:</p>
+        <p className="text-sm ml-2">{details.customer.phoneNumber}</p>
       </div>
       <div className="flex items-center">
-        <p className="text-lg font-bold">Total Reward Added:</p>
-        <p className="text-lg ml-2 text-gray-800">
+        <p className="text-sm font-bold">Total Reward Added:</p>
+        <p className="text-sm ml-2 text-gray-800">
           {details.customer.totalAddedPoints}
         </p>
       </div>
       <div className="flex items-center">
-        <p className="text-lg font-bold">Reward Points Available:</p>
-        <p className="text-lg ml-2 text-gray-800">
+        <p className="text-sm font-bold">Reward Points Available:</p>
+        <p className="text-sm ml-2 text-gray-800">
           {details.customer.totalAddedPoints -
             details.customer.totalRedeemedPoints}
         </p>
       </div>
       <div className="flex items-center">
-        <p className="text-lg font-bold">Agree to Promotional Emails:</p>
-        <p className="text-lg ml-2 text-gray-800">
+        <p className="text-sm font-bold">Agree to Promotional Emails:</p>
+        <p className="text-sm ml-2 text-gray-800">
           {details.customer.agreePromotionalEmails ? "Yes" : "No"}
         </p>
       </div>
       <div className="flex items-center">
-        <p className="text-lg font-bold">Agree to Data Sharing:</p>
-        <p className="text-lg ml-2 text-gray-800">
+        <p className="text-sm font-bold">Agree to Data Sharing:</p>
+        <p className="text-sm ml-2 text-gray-800">
           {details.customer.agreeDataSharing ? "Yes" : "No"}
         </p>
       </div>
@@ -178,6 +166,7 @@ const CustomerDetails = ({ details }) => {
           loading={loading}
           rowKey="id"
           pagination={false}
+          scroll={{ y: 240 }}
         />
       </div>
 
@@ -186,6 +175,7 @@ const CustomerDetails = ({ details }) => {
         visible={isModalVisible}
         onOk={handleAddReward}
         onCancel={() => setIsModalVisible(false)}
+        okButtonProps={{ style: { backgroundColor: '#4f46e5', color: 'white' } }}
       >
         <Form form={form} layout="vertical">
           <Form.Item
@@ -195,7 +185,7 @@ const CustomerDetails = ({ details }) => {
           >
             <Select placeholder="Select Action">
               <Select.Option value="add">Add Points</Select.Option>
-              <Select.Option value="remove">Reedeem Points</Select.Option>
+              <Select.Option value="redeem">Redeem Points</Select.Option>
             </Select>
           </Form.Item>
           <Form.Item
@@ -206,8 +196,12 @@ const CustomerDetails = ({ details }) => {
             <Input placeholder="Enter Points" />
           </Form.Item>
         </Form>
-        
       </Modal>
+      <div className="flex col-span-2">
+        <Button onClick={() => setIsModalVisible(true)}>
+          <PlusOutlined className="mr-2" /> Add Reward
+        </Button>
+      </div>
     </div>
   );
 };

@@ -36,11 +36,30 @@ const Login = () => {
 
       if (response.data.success) {
         localStorage.setItem("accessToken", response.data.token);
-        localStorage.setItem(
-          "usename",
-          response.data.restaurantAdmin.ownerName
-        );
-        localStorage.setItem("restaurantId", response.data.restaurantAdmin._id);
+
+        if (response.data.restaurantAdmin) {
+          localStorage.setItem(
+            "username",
+            response.data.restaurantAdmin.ownerName || "N/A"
+          );
+          localStorage.setItem(
+            "restaurantId",
+            response.data.restaurantAdmin._id || "N/A"
+          );
+        }
+
+        if (response.data.productAdmin) {
+          localStorage.setItem("accessToken", response.data.token);
+          localStorage.setItem(
+            "username",
+            response.data.productAdmin.username || "N/A"
+          );
+          localStorage.setItem(
+            "productAdminId",
+            response.data.productAdmin._id || "N/A"
+          );
+        }
+
         toast.success("Logged in successfully!");
         if (activeTab === "ProductAdmin") {
           navigate("/product-admin/dashboard");
@@ -51,6 +70,7 @@ const Login = () => {
         toast.error(response.data.message || "Login failed");
       }
     } catch (error) {
+      console.error("Login error: ", error.response || error.message);
       toast.error(
         error.response?.data?.message || "An error occurred. Please try again."
       );

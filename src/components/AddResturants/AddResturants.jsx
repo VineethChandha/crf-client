@@ -21,15 +21,15 @@ const AddRestaurantForm = ({ onSubmit, onCancel, initialData }) => {
       setFormData({
         restaurantName: initialData.restaurantName || "",
         address: initialData.address || "",
-        LLC: initialData.LLC || "",
+        LLC: initialData.llc || "",
         phoneNumber: initialData.phoneNumber || "",
         email: initialData.email || "",
         ownerName: initialData.ownerName || "",
         password: initialData.password || "",
-        primaryContactName: initialData.primaryContactName || "",
-        primaryContactAddress: initialData.primaryContactAddress || "",
-        primaryContactEmail: initialData.primaryContactEmail || "",
-        agreeTerms: initialData.agreeTerms || false,
+        primaryContactName: initialData.primaryContactDetails?.name || "",
+        primaryContactAddress: initialData.primaryContactDetails?.address || "",
+        primaryContactEmail: initialData.primaryContactDetails?.email || "",
+        agreeTerms: initialData.agreementAccepted || false,
       });
     }
   }, [initialData]);
@@ -80,7 +80,6 @@ const AddRestaurantForm = ({ onSubmit, onCancel, initialData }) => {
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           />
         </div>
-
         <div className="mb-4">
           <label className="block text-gray-700">Address</label>
           <input
@@ -204,7 +203,9 @@ const AddRestaurantForm = ({ onSubmit, onCancel, initialData }) => {
         </label>
       </div>
       <div className="flex justify-between gap-4">
-        <Button type="submit">Add Restaurant</Button>
+        <Button type="submit">
+          {initialData ? "Edit Restaurant" : "Add Restaurant"}
+        </Button>
         <Button onClick={onCancel} variant="secondary">
           Cancel
         </Button>

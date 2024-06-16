@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Modal, Table, message } from "antd";
+import { Modal, Table, message, Tag } from "antd";
+import { MdOutlineEdit, MdOutlineAdd, MdDeleteOutline } from "react-icons/md";
 import ProductNavbar from "../../../components/ProductNavbar/ProductNavbar";
 import Button from "../../../components/Button/Button";
-import { MdOutlineAdd } from "react-icons/md";
 import AddRestaurantForm from "../../../components/AddResturants/AddResturants";
+
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 const Dashboard = () => {
@@ -14,6 +15,7 @@ const Dashboard = () => {
   const [total, setTotal] = useState(0);
   const [searchedValue, setSearchedValue] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editRestaurant, setEditRestaurant] = useState(null);
 
   const fetchRestaurants = async (searchTerm, currentPage = page) => {
     setLoading(true);
@@ -47,6 +49,7 @@ const Dashboard = () => {
   };
 
   const showModal = () => {
+    setEditRestaurant(null);
     setIsModalOpen(true);
   };
 
@@ -76,28 +79,87 @@ const Dashboard = () => {
         setIsModalOpen(false);
         fetchRestaurants(searchedValue);
       } else {
-        console.log(response.data);
         message.success(response.data.message || "Failed to add restaurant");
         setIsModalOpen(false);
         fetchRestaurants(searchedValue);
       }
     } catch (error) {
-      console.error("Error adding restaurant:", error);
       message.error("An error occurred while adding restaurant");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchRestaurants(searchedValue);
-  }, [searchedValue, page]);
+  const editRestaurantApi = async (restaurantData, id) => {
+    setLoading(true);
+    try {
+      const sessionToken = localStorage.getItem("accessToken");
+      const response = await axios.put(
+        `${apiUrl}/productAdmin/editRestaurant/${id}`,
+        restaurantData,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionToken}`,
+          },
+        }
+      );
+      if (response.data && response.data.success) {
+        message.success("Restaurant edited successfully");
+        setIsModalOpen(false);
+        fetchRestaurants(searchedValue);
+      } else {
+        message.error(response.data.message || "Failed to edit restaurant");
+        setIsModalOpen(false);
+        fetchRestaurants(searchedValue);
+      }
+    } catch (error) {
+      message.error("An error occurred while editing restaurant");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteRestaurantApi = async (restaurantId) => {
+    setLoading(true);
+
+    try {
+      const sessionToken = localStorage.getItem("accessToken");
+      const response = await axios.delete(
+        `${apiUrl}/productAdmin/deleteRestaurant/${restaurantId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${sessionToken}`,
+          },
+        }
+      );
+
+      message.success("Restaurant deleted successfully")
+      fetchRestaurants(searchedValue);
+    } catch (error) {
+      message.error("An error occurred while deleting restaurant");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEdit = (record) => {
+    setEditRestaurant(record);
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = (restaurantId) => {
+    deleteRestaurantApi(restaurantId);
+  };
 
   const handleSearch = (searchTerm) => {
     setSearchedValue(searchTerm);
     setPage(1);
     fetchRestaurants(searchTerm, 1);
   };
+
+  useEffect(() => {
+    fetchRestaurants(searchedValue);
+  }, [searchedValue, page]);
 
   const columns = [
     {
@@ -121,10 +183,33 @@ const Dashboard = () => {
       key: "email",
     },
     {
-      title: "Action",
+      title: "Status",
       dataIndex: "isAccepted",
       key: "isAccepted",
-      render: (isAccepted) => (isAccepted ? "Accepted" : "Not Accepted"),
+      render: (isAccepted) => (
+        <Tag color={isAccepted ? "green" : "red"}>
+          {isAccepted ? "Accepted" : "Not Accepted"}
+        </Tag>
+      ),
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <span className="flex gap-4">
+          <MdOutlineEdit
+            size={20}
+            className="cursor-pointer"
+            onClick={() => handleEdit(record)}
+            style={{ marginRight: 8 }}
+          />
+          <MdDeleteOutline
+            size={20}
+            className="cursor-pointer"
+            onClick={() => handleDelete(record._id)}
+          />
+        </span>
+      ),
     },
   ];
 
@@ -132,13 +217,21 @@ const Dashboard = () => {
     <div className="min-h-screen mx-[34px] my-4">
       <ProductNavbar onSearch={handleSearch} />
       <Modal
-        title="Add Restaurant"
+        title={editRestaurant ? "Edit Restaurant" : "Add Restaurant"}
         visible={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
         footer={null}
       >
-        <AddRestaurantForm onSubmit={addRestaurant} onCancel={handleCancel} />
+        <AddRestaurantForm
+          onSubmit={(data) =>
+            editRestaurant
+              ? editRestaurantApi(data, editRestaurant._id)
+              : addRestaurant(data)
+          }
+          onCancel={handleCancel}
+          initialData={editRestaurant}
+        />
       </Modal>
       <div className="flex justify-between mt-4">
         <div>
@@ -151,7 +244,7 @@ const Dashboard = () => {
           </Button>
         </div>
       </div>
-      <div className=" bg-white shadow-lg rounded-lg my-4 p-6 border border-gray-200">
+      <div className="bg-white shadow-lg rounded-lg my-4 p-6 border border-gray-200">
         <Table
           columns={columns}
           dataSource={restaurants}

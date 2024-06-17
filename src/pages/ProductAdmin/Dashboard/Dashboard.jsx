@@ -1,10 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Modal, Table, message, Tag } from "antd";
-import { MdOutlineEdit, MdOutlineAdd, MdDeleteOutline } from "react-icons/md";
+import {
+  MdOutlineEdit,
+  MdOutlineAdd,
+  MdDeleteOutline,
+  MdRemoveRedEye,
+} from "react-icons/md";
 import ProductNavbar from "../../../components/ProductNavbar/ProductNavbar";
 import Button from "../../../components/Button/Button";
 import AddRestaurantForm from "../../../components/AddResturants/AddResturants";
+import CustomerDetails from "../../../components/CustomerDetails/CustomerDetails";
+import moment from "moment";
+import ProductCustomerDetails from "../../../components/ProductCustomerDetails.jsx/ProductCustomerDetails";
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -15,7 +23,14 @@ const Dashboard = () => {
   const [total, setTotal] = useState(0);
   const [searchedValue, setSearchedValue] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isCustomersModalOpen, setIsCustomersModalOpen] = useState(false);
   const [editRestaurant, setEditRestaurant] = useState(null);
+  const [viewRestaurant, setViewRestaurant] = useState(null);
+  const [customers, setCustomers] = useState([]);
+  const [totalPages, setTotalPages] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [error, setError] = useState(null);
 
   const fetchRestaurants = async (searchTerm, currentPage = page) => {
     setLoading(true);
@@ -133,7 +148,7 @@ const Dashboard = () => {
         }
       );
 
-      message.success("Restaurant deleted successfully")
+      message.success("Restaurant deleted successfully");
       fetchRestaurants(searchedValue);
     } catch (error) {
       message.error("An error occurred while deleting restaurant");
@@ -149,6 +164,63 @@ const Dashboard = () => {
 
   const handleDelete = (restaurantId) => {
     deleteRestaurantApi(restaurantId);
+  };
+
+  const handleView = async (id) => {
+    setLoading(true);
+    try {
+      const sessionToken = localStorage.getItem("accessToken");
+      const response = await axios.post(
+        `${apiUrl}/productAdmin/getRestaurant`,
+        { id },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionToken}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        setViewRestaurant(response.data.restaurantData);
+        setIsDetailsModalOpen(true);
+      } else {
+        message.error("Failed to fetch restaurant details");
+      }
+    } catch (error) {
+      console.error("Error fetching restaurant details:", error);
+      message.error("An error occurred while fetching restaurant details");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleViewCustomers = async (restaurantId) => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("accessToken");
+      const response = await axios.post(
+        `${apiUrl}/common/getCustomers`,
+        {
+          page: page,
+          limit: 10,
+          restaurantId: restaurantId,
+          phone: searchTerm,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setCustomers(response.data.data);
+      setIsCustomersModalOpen(true);
+      setTotal(response.data.total);
+      setTotalPages(response.data.totalPages);
+      setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
   };
 
   const handleSearch = (searchTerm) => {
@@ -197,11 +269,15 @@ const Dashboard = () => {
       key: "action",
       render: (_, record) => (
         <span className="flex gap-4">
+          <MdRemoveRedEye
+            size={20}
+            className="cursor-pointer"
+            onClick={() => handleView(record._id)}
+          />
           <MdOutlineEdit
             size={20}
             className="cursor-pointer"
             onClick={() => handleEdit(record)}
-            style={{ marginRight: 8 }}
           />
           <MdDeleteOutline
             size={20}
@@ -233,6 +309,49 @@ const Dashboard = () => {
           initialData={editRestaurant}
         />
       </Modal>
+      <Modal
+        title="Restaurant Details"
+        visible={isDetailsModalOpen}
+        onOk={() => setIsDetailsModalOpen(false)}
+        onCancel={() => setIsDetailsModalOpen(false)}
+        footer={null}
+      >
+        {viewRestaurant && (
+          <div className="grid grid-cols-2 space-y-2 py-6">
+            <p className="text-[16px]">
+              <strong>Restaurant Name:</strong> {viewRestaurant.restaurantName}
+            </p>
+            <p className="text-[16px]">
+              <strong>Phone:</strong> {viewRestaurant.phoneNumber}
+            </p>
+            <p className="text-[16px]">
+              <strong>Owner Name:</strong>{" "}
+              {viewRestaurant.primaryContactDetails.name}
+            </p>
+            <p className="text-[16px]">
+              <strong>Email:</strong> {viewRestaurant.email}
+            </p>
+            <p className="text-[16px]">
+              <strong>Address:</strong>
+              {viewRestaurant.primaryContactDetails.address}
+            </p>
+          </div>
+        )}
+        <div className="flex gap-8 mt-4">
+          <Button>Download Data</Button>
+          <Button
+            variant="secondary"
+            onClick={() => handleViewCustomers(viewRestaurant._id)}
+          >
+            View Customers
+          </Button>
+        </div>
+      </Modal>
+      <ProductCustomerDetails
+        visible={isCustomersModalOpen}
+        onCancel={() => setIsCustomersModalOpen(false)}
+        customers={customers}
+      />
       <div className="flex justify-between mt-4">
         <div>
           <h1 className="font-medium text-lg mb-4">Restaurants</h1>

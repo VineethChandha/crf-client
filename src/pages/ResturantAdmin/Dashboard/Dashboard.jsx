@@ -8,6 +8,7 @@ import AddCustomerForm from "../../../components/AddCustomer/AddCustomer";
 import CustomerDetails from "../../../components/CustomerDetails/CustomerDetails";
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
 import { MdOutlineAdd } from "react-icons/md";
+import { CSVLink } from "react-csv";
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 function Dashboard() {
@@ -299,8 +300,29 @@ function Dashboard() {
         )}
       </Modal>
 
-      <Modal
+      {/* <Modal
         title="Customer Details"
+        visible={detailModalOpen}
+        onOk={() => setDetailModalOpen(false)}
+        onCancel={() => setDetailModalOpen(false)}
+        footer={null}
+        width={1000}
+      >
+        <div className="w-full flex justify-end">
+          <Button
+            className="w-1/5"
+            children="Download"
+          />
+        </div>
+        <CustomerDetails details={customerDetails} />
+      </Modal> */}
+
+      <Modal
+        title={
+          <div className="flex justify-between ">
+            <span>Customer Details</span>
+          </div>
+        }
         visible={detailModalOpen}
         onOk={() => setDetailModalOpen(false)}
         onCancel={() => setDetailModalOpen(false)}

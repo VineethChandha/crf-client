@@ -13,6 +13,7 @@ import AddRestaurantForm from "../../../components/AddResturants/AddResturants";
 import CustomerDetails from "../../../components/CustomerDetails/CustomerDetails";
 import moment from "moment";
 import ProductCustomerDetails from "../../../components/ProductCustomerDetails.jsx/ProductCustomerDetails";
+import { useNavigate } from 'react-router-dom';
 
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -31,6 +32,8 @@ const Dashboard = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
 
   const fetchRestaurants = async (searchTerm, currentPage = page) => {
     setLoading(true);
@@ -166,32 +169,36 @@ const Dashboard = () => {
     deleteRestaurantApi(restaurantId);
   };
 
-  const handleView = async (id) => {
-    setLoading(true);
-    try {
-      const sessionToken = localStorage.getItem("accessToken");
-      const response = await axios.post(
-        `${apiUrl}/productAdmin/getRestaurant`,
-        { id },
-        {
-          headers: {
-            Authorization: `Bearer ${sessionToken}`,
-          },
-        }
-      );
-      if (response.status === 200) {
-        setViewRestaurant(response.data.restaurantData);
-        setIsDetailsModalOpen(true);
-      } else {
-        message.error("Failed to fetch restaurant details");
-      }
-    } catch (error) {
-      console.error("Error fetching restaurant details:", error);
-      message.error("An error occurred while fetching restaurant details");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const handleView = () => {
+    navigate('/product-admin/view-resturants');
+  }
+
+  // const handleView = async (id) => {
+  //   setLoading(true);
+  //   try {
+  //     const sessionToken = localStorage.getItem("accessToken");
+  //     const response = await axios.post(
+  //       `${apiUrl}/productAdmin/getRestaurant`,
+  //       { id },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${sessionToken}`,
+  //         },
+  //       }
+  //     );
+  //     if (response.status === 200) {
+  //       setViewRestaurant(response.data.restaurantData);
+  //       setIsDetailsModalOpen(true);
+  //     } else {
+  //       message.error("Failed to fetch restaurant details");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching restaurant details:", error);
+  //     message.error("An error occurred while fetching restaurant details");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleViewCustomers = async (restaurantId) => {
     setLoading(true);

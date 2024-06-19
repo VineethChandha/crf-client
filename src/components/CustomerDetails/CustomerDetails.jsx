@@ -4,7 +4,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
 import moment from "moment";
 import Button from "../../components/Button/Button.jsx";
-import { CSVLink } from 'react-csv';
+import { CSVLink } from "react-csv";
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 const CustomerDetails = ({ details }) => {
@@ -16,7 +16,11 @@ const CustomerDetails = ({ details }) => {
   const [total, setTotal] = useState(0);
   const [totalData, setTotalData] = useState([]);
 
-  const fetchRewardPoints = async (p = page, limit = 5, isFromDownload = false) => {
+  const fetchRewardPoints = async (
+    p = page,
+    limit = 5,
+    isFromDownload = false
+  ) => {
     setLoading(true);
     try {
       const token = localStorage.getItem("accessToken");
@@ -123,57 +127,65 @@ const CustomerDetails = ({ details }) => {
       title: "Reward Points",
       dataIndex: "points",
       key: "points",
-    }
+    },
   ];
 
   const headers = [
-    { label: 'Date', key: 'createdAt' },
-    { label: 'Time', key: 'timestamp' },
-    { label: 'Reward Points', key: 'points' }
+    { label: "Date", key: "createdAt" },
+    { label: "Time", key: "timestamp" },
+    { label: "Reward Points", key: "points" },
   ];
 
   const customerHeaders = [
-    { label: 'First Name', key: 'firstName' },
-    { label: 'Last Name', key: 'lastName' },
-    { label: 'Gender', key: 'gender' },
-    { label: 'Registered On', key: 'createdAt' },
-    { label: 'Email', key: 'email' },
-    { label: 'Phone', key: 'phoneNumber' },
-    { label: 'Total Reward Added', key: 'totalAddedPoints' },
-    { label: 'Reward Points Available', key: 'totalPoints' },
-    { label: 'Agree to Promotional Emails', key: 'agreePromotionalEmails' },
-    { label: 'Agree to Data Sharing', key: 'agreeDataSharing' },
+    { label: "First Name", key: "firstName" },
+    { label: "Last Name", key: "lastName" },
+    { label: "Gender", key: "gender" },
+    { label: "Registered On", key: "createdAt" },
+    { label: "Email", key: "email" },
+    { label: "Phone", key: "phoneNumber" },
+    { label: "Total Reward Added", key: "totalAddedPoints" },
+    { label: "Reward Points Available", key: "totalPoints" },
+    { label: "Agree to Promotional Emails", key: "agreePromotionalEmails" },
+    { label: "Agree to Data Sharing", key: "agreeDataSharing" },
   ];
 
-  const dataForExport = totalData.map(item => ({
+  const dataForExport = totalData.map((item) => ({
     createdAt: moment(item.createdAt).format("DD/MM/YYYY"),
-    timestamp: moment(item.timestamp, 'HH:mm:ss').format('hh:mm A'),
-    points: item.points
+    timestamp: moment(item.timestamp, "HH:mm:ss").format("hh:mm A"),
+    points: item.points,
   }));
 
   const customerDownload = [
     {
-
       firstName: details.customer.firstName,
       lastName: details.customer.lastName,
       gender: details.customer.gender[0],
       email: details.customer.email,
       phoneNumber: details.customer.phoneNumber,
       totalAddedPoints: details.customer.totalAddedPoints,
-      totalPoints: details.customer.totalAddedPoints - details.customer.totalRedeemedPoints,
-      agreePromotionalEmails: details.customer.agreePromotionalEmails ? 'Yes' : 'No',
-      agreeDataSharing: details.customer.agreeDataSharing ? 'Yes' : 'No',
-      createdAt: moment(details.createdAt).format("DD/MM/YYYY")
-    }
-  ]
-
+      totalPoints:
+        details.customer.totalAddedPoints -
+        details.customer.totalRedeemedPoints,
+      agreePromotionalEmails: details.customer.agreePromotionalEmails
+        ? "Yes"
+        : "No",
+      agreeDataSharing: details.customer.agreeDataSharing ? "Yes" : "No",
+      createdAt: moment(details.createdAt).format("DD/MM/YYYY"),
+    },
+  ];
 
   return (
     <div>
       <div className="w-full flex justify-end pb-2">
-        <CSVLink className="border py-2 px-4 bg-green-400 hover:text-black" data={customerDownload} headers={customerHeaders} filename="customer_details.csv">
-          Download
-        </CSVLink>
+        <Button>
+          <CSVLink
+            data={customerDownload}
+            headers={customerHeaders}
+            filename="customer_details.csv"
+          >
+            Download
+          </CSVLink>
+        </Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-white shadow rounded-lg w-full">
         <div className="flex items-center">
@@ -241,10 +253,19 @@ const CustomerDetails = ({ details }) => {
             loading={loading}
             rowKey="id"
             title={() => (
-              <div className="w-full flex justify-end">
-                <CSVLink className="border py-2 px-4 bg-green-400 hover:text-black" data={dataForExport} headers={headers} filename="reward_points.csv">
-                  Download
-                </CSVLink>
+              <div className="w-full flex justify-between items-center">
+                <div className="font-semibold">
+                  <p>Rewards Point Table</p>
+                </div>
+                <Button>
+                  <CSVLink
+                    data={dataForExport}
+                    headers={headers}
+                    filename="reward_points.csv"
+                  >
+                    Download
+                  </CSVLink>
+                </Button>
               </div>
             )}
             scroll={{ y: 240 }}
@@ -256,7 +277,9 @@ const CustomerDetails = ({ details }) => {
           visible={isModalVisible}
           onOk={handleAddReward}
           onCancel={() => setIsModalVisible(false)}
-          okButtonProps={{ style: { backgroundColor: '#4f46e5', color: 'white' } }}
+          okButtonProps={{
+            style: { backgroundColor: "#4f46e5", color: "white" },
+          }}
         >
           <Form form={form} layout="vertical">
             <Form.Item
@@ -278,11 +301,11 @@ const CustomerDetails = ({ details }) => {
             </Form.Item>
           </Form>
         </Modal>
-        <div className="flex col-span-2">
+        {/* <div className="flex col-span-2">
           <Button onClick={() => setIsModalVisible(true)}>
             <PlusOutlined className="mr-2" /> Add Reward
           </Button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

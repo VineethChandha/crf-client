@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../../../components/Navbar/Navbar";
+import ProductNavbar from "../../../components/ProductNavbar/ProductNavbar";
 import { Table, Spin, Alert, Modal, Form, Input, Select } from "antd";
 import axios from "axios";
 import moment from "moment";
@@ -9,9 +9,11 @@ import CustomerDetails from "../../../components/CustomerDetails/CustomerDetails
 import { FaEdit, FaEye, FaMinus, FaPlus, FaTrash } from "react-icons/fa";
 import { MdOutlineAdd } from "react-icons/md";
 import { CSVLink } from "react-csv";
+import { IoIosArrowBack } from "react-icons/io";
+import { useNavigate } from "react-router-dom";
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
-function Dashboard() {
+function ProductAdminCustomer() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,6 +28,8 @@ function Dashboard() {
   const [customerDetails, setCustomerDetails] = useState(null);
   const [rewardModalOpen, setRewardModalOpen] = useState(false);
   const [form] = Form.useForm();
+
+  const navigate = useNavigate();
 
   const handleDeleteCustomer = async (_id) => {
     Modal.confirm({
@@ -284,7 +288,7 @@ function Dashboard() {
           page: page,
           limit: 10,
           restaurantId: restaurantId,
-          name: searchTerm,
+          phone: searchTerm,
         },
         {
           headers: {
@@ -326,7 +330,14 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="relative z-10 px-[48px] py-[20px]">
-        <Navbar onSearch={setSearchTerm} />
+        <ProductNavbar />
+        <button
+          className="flex items-center text-[#1f2937] hover:text-gray-900 mt-4 font-semibold cursor-pointer"
+          onClick={() => navigate(-1)}
+        >
+          <IoIosArrowBack className="mr-2" />
+          Back
+        </button>
       </div>
       <Modal
         title="Add Customer"
@@ -421,7 +432,7 @@ function Dashboard() {
           <h3 className="font-medium text-lg mb-4">Customers Details</h3>
         </div>
         <div>
-          <Button onClick={showModal} variant="secondary">
+          <Button onClick={showModal} >
             <MdOutlineAdd size={20} className="mr-[4px] font-semibold" />
             Add customer
           </Button>
@@ -450,4 +461,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default ProductAdminCustomer;

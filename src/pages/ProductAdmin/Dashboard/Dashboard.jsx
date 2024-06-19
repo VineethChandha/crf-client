@@ -138,28 +138,35 @@ const Dashboard = () => {
   };
 
   const deleteRestaurantApi = async (restaurantId) => {
-    setLoading(true);
-
-    try {
-      const sessionToken = localStorage.getItem("accessToken");
-      const response = await axios.delete(
-        `${apiUrl}/productAdmin/deleteRestaurant/${restaurantId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${sessionToken}`,
-          },
+    Modal.confirm({
+      title: "Are you sure you want to delete this restaurant?",
+      content: "This action cannot be undone.",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      onOk: async () => {
+        setLoading(true);
+        try {
+          const sessionToken = localStorage.getItem("accessToken");
+          const response = await axios.delete(
+            `${apiUrl}/productAdmin/deleteRestaurant/${restaurantId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${sessionToken}`,
+              },
+            }
+          );
+  
+          message.success("Restaurant deleted successfully");
+          fetchRestaurants(searchedValue);
+        } catch (error) {
+          message.error("An error occurred while deleting restaurant");
+        } finally {
+          setLoading(false);
         }
-      );
-
-      message.success("Restaurant deleted successfully");
-      fetchRestaurants(searchedValue);
-    } catch (error) {
-      message.error("An error occurred while deleting restaurant");
-    } finally {
-      setLoading(false);
-    }
+      },
+    });
   };
-
   const handleEdit = (record) => {
     setEditRestaurant(record);
     setIsModalOpen(true);

@@ -1,8 +1,8 @@
 import React from "react";
 
-const Button = ({ type = "button", variant = "primary", className="", children, onClick }) => {
+const Button = ({ type = "button", variant = "primary", className = "", children, onClick }) => {
   const baseStyle =
-    "w-full flex justify-center items-center font-semibold py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2";
+    "flex justify-center items-center font-semibold py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2";
 
   const variants = {
     primary: "text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 ease-in-out duration-150",
@@ -13,7 +13,7 @@ const Button = ({ type = "button", variant = "primary", className="", children, 
   return (
     <button
       type={type}
-      className={`${baseStyle} ${className} ${variants[variant]}`}
+      className={`${baseStyle} ${variants[variant]} ${className}`}
       onClick={onClick}
       disabled={variant === "disabled"}
     >

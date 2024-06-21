@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Navbar from "../../../components/Navbar/Navbar";
 import { Table, Spin, Alert, Modal, Form, Input, Select } from "antd";
 import axios from "axios";
@@ -8,6 +8,8 @@ import AddCustomerForm from "../../../components/AddCustomer/AddCustomer";
 import CustomerDetails from "../../../components/CustomerDetails/CustomerDetails";
 import { FaEdit, FaEye, FaMinus, FaPlus, FaTrash } from "react-icons/fa";
 import { MdOutlineAdd } from "react-icons/md";
+import { toast } from "react-toastify";
+import ToastNotificationContainer from "../../../components/ToastContainer/ToastContainer";
 import { CSVLink } from "react-csv";
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -26,6 +28,10 @@ function Dashboard() {
   const [customerDetails, setCustomerDetails] = useState(null);
   const [rewardModalOpen, setRewardModalOpen] = useState(false);
   const [form] = Form.useForm();
+
+  const [allCustomersData, setAllCustomersData] = useState([]);
+  const [downloading, setDownloading] = useState(false);
+  const csvLink = useRef(null);
 
   const handleDeleteCustomer = async (_id) => {
     Modal.confirm({
@@ -128,12 +134,6 @@ function Dashboard() {
     } catch (err) {
       console.error("Error fetching customer details:", err);
     }
-  };
-
-  const showRewardModal = (record, action) => {
-    setSelectedCustomer(record);
-    form.setFieldsValue({ action });
-    setRewardModalOpen(true);
   };
 
   const handleRewardOk = () => {
@@ -262,10 +262,12 @@ function Dashboard() {
         console.error(`Error: ${response.status} - ${response.statusText}`);
       }
     } catch (err) {
+      console.log(err);
       if (err.response) {
         console.error(
-          `Server Error: ${err.response.status} - ${err.response.data.message}`
+          `Server Error: ${err.response.status} - ${err.response.data.error}`
         );
+        toast.error(err.response.data.error);
       } else if (err.request) {
         console.error("No response received:", err.request);
       } else {
@@ -274,15 +276,15 @@ function Dashboard() {
     }
   };
 
-  const fetchCustomers = async () => {
+  const fetchCustomers = async (p = page, limit = 10, fetchAllCustomers = false) => {
     try {
       const restaurantId = localStorage.getItem("restaurantId");
       const token = localStorage.getItem("accessToken");
       const response = await axios.post(
         `${apiUrl}/common/getCustomers`,
         {
-          page: page,
-          limit: 10,
+          page: p,
+          limit: limit,
           restaurantId: restaurantId,
           name: searchTerm,
         },
@@ -293,6 +295,11 @@ function Dashboard() {
         }
       );
 
+      if (fetchAllCustomers) {
+        setAllCustomersData(response.data.data);
+        return;
+      }
+
       setData(response.data.data);
       setTotal(response.data.total);
       setTotalPages(response.data.totalPages);
@@ -301,6 +308,62 @@ function Dashboard() {
       setError(err.message);
       setLoading(false);
     }
+  };
+
+  const customerHeaders = [
+    { label: "First Name", key: "firstName" },
+    { label: "Last Name", key: "lastName" },
+    { label: "Gender", key: "gender" },
+    { label: "Email", key: "email" },
+    { label: "Phone Number", key: "phoneNumber" },
+    { label: "Date of Birth", key: "dob" },
+    { label: "Address", key: "address" },
+    { label: "State", key: "state" },
+    { label: "City", key: "city" },
+    { label: "Zipcode", key: "zipCode" },
+    { label: "Agree Data Sharing", key: "agreeDataSharing" },
+    { label: "Agree Promotional Emails", key: "agreePromotionalEmails" },
+    { label: "Registered On", key: "createdAt" }
+  ];
+
+  const allCustomerDownload = allCustomersData.map((details) => ({
+    firstName: details.firstName,
+    lastName: details.lastName,
+    gender: details.gender[0],
+    email: details.email,
+    phoneNumber: details.phoneNumber,
+    dob: moment(details.dob).format("DD/MM/YYYY"),
+    address: details.address,
+    state: details.state,
+    city: details.city,
+    zipCode: details.zipCode,
+    agreeDataSharing: details.agreeDataSharing ? "Yes" : "No",
+    agreePromotionalEmails: details.agreePromotionalEmails
+      ? "Yes"
+      : "No",
+    createdAt: moment(details.createdAt).format("DD/MM/YYYY"),
+  }));
+
+  const handleDownload = async () => {
+    setDownloading(true);
+    try {
+      fetchCustomers(1, 2000, true);
+    } catch (error) {
+      console.error("Error downloading reward points:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (allCustomersData.length > 0 && csvLink.current) {
+      csvLink.current.link.click();
+      setDownloading(false);
+    }
+  }, [allCustomersData]);
+
+  const showRewardModal = (record, action) => {
+    setSelectedCustomer(record);
+    form.setFieldsValue({ action });
+    setRewardModalOpen(true);
   };
 
   useEffect(() => {
@@ -325,6 +388,7 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      <ToastNotificationContainer />
       <div className="relative z-10 px-[48px] py-[20px]">
         <Navbar onSearch={setSearchTerm} />
       </div>
@@ -420,7 +484,18 @@ function Dashboard() {
         <div>
           <h3 className="font-medium text-lg mb-4">Customers Details</h3>
         </div>
-        <div>
+        <div className="flex gap-3">
+          <Button onClick={handleDownload} variant={downloading ? 'disabled' : ''} className="text-white bg-indigo-600">
+            {downloading ? 'Downloading...' : 'Download'}
+          </Button>
+          <CSVLink
+            data={allCustomerDownload}
+            headers={customerHeaders}
+            filename="all_customers.csv"
+            ref={csvLink}
+            className="hidden"
+            target="_blank"
+          />
           <Button onClick={showModal} variant="secondary">
             <MdOutlineAdd size={20} className="mr-[4px] font-semibold" />
             Add customer

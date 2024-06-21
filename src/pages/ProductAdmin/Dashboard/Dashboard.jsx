@@ -102,7 +102,7 @@ const Dashboard = () => {
         fetchRestaurants(searchedValue);
       }
     } catch (error) {
-      message.error("An error occurred while adding restaurant");
+      message.error(error.response.data.error || "An error occurred while adding restaurant");
     } finally {
       setLoading(false);
     }
@@ -156,7 +156,7 @@ const Dashboard = () => {
               },
             }
           );
-  
+
           message.success("Restaurant deleted successfully");
           fetchRestaurants(searchedValue);
         } catch (error) {

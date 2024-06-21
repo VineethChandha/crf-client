@@ -23,7 +23,7 @@ const AddCustomerForm = ({ onSubmit, onCancel, initialData }) => {
         firstName: initialData.firstName || "",
         lastName: initialData.lastName || "",
         gender: initialData.gender || "",
-        dob: initialData.dob || "", 
+        dob: initialData.dob || "",
         phoneNumber: initialData.phoneNumber || "",
         email: initialData.email || "",
         address: initialData.address || "",

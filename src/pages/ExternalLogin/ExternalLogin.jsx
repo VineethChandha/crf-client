@@ -6,8 +6,10 @@ import Input from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
 import axios from "axios";
 import ToastNotificationContainer from "../../components/ToastContainer/ToastContainer";
+import { useNavigate } from "react-router-dom";
 
 const RegisterRestaurant = () => {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -38,10 +40,12 @@ const RegisterRestaurant = () => {
         payload
       );
 
-      toast.success("Restaurant registered successfully!");
+      if (response.status === 201) {
+        navigate("/", { state: { message: "Restaurant registered successfully!" } });
+      }
       console.log(response.data);
     } catch (error) {
-      toast.error("Failed to register restaurant.");
+      toast.error(error.response.data.error);
       console.error(error);
     }
     setLoading(false);
@@ -57,7 +61,7 @@ const RegisterRestaurant = () => {
       style={{ backgroundImage: `url(${bgImage})` }}
     >
       <ToastNotificationContainer />
-      <div className="bg-white bg-opacity-75 p-8 rounded-lg shadow-lg w-full sm:mx-[360px] mx-[12px] my-[90px]">
+      <div className="bg-white bg-opacity-75 p-8 rounded-lg shadow-lg w-full mx-16 sm:mx-38 md:mx-36 lg:mx-64 my-[90px]">
         <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
           Register Your Restaurant
         </h2>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Table, Modal, Form, Input, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
@@ -15,6 +15,9 @@ const CustomerDetails = ({ details }) => {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [totalData, setTotalData] = useState([]);
+
+  const [downloading, setDownloading] = useState(false);
+  const csvLink = useRef(null);
 
   const fetchRewardPoints = async (
     p = page,
@@ -51,6 +54,15 @@ const CustomerDetails = ({ details }) => {
     }
   };
 
+  const handleDownload = async () => {
+    setDownloading(true);
+    try {
+      fetchRewardPoints(1, 2000, true);
+    } catch (error) {
+      console.error("Error downloading reward points:", error);
+    }
+  };
+
   useEffect(() => {
     setPage(1);
   }, [details]);
@@ -58,9 +70,15 @@ const CustomerDetails = ({ details }) => {
   useEffect(() => {
     if (details) {
       fetchRewardPoints();
-      fetchRewardPoints(1, 2000, true);
     }
   }, [page, details]);
+
+  useEffect(() => {
+    if (totalData.length > 0 && csvLink.current) {
+      csvLink.current.link.click();
+      setDownloading(false);
+    }
+  }, [totalData]);
 
   if (!details) return null;
 
@@ -134,6 +152,10 @@ const CustomerDetails = ({ details }) => {
     { label: "Date", key: "createdAt" },
     { label: "Time", key: "timestamp" },
     { label: "Reward Points", key: "points" },
+    { label: "First Name", key: "firstName" },
+    { label: "Last Name", key: "lastName" },
+    { label: "Email", key: "email" },
+    { label: "Phone Number", key: "phoneNumber" }
   ];
 
   const customerHeaders = [
@@ -150,6 +172,10 @@ const CustomerDetails = ({ details }) => {
   ];
 
   const dataForExport = totalData.map((item) => ({
+    firstName: details.customer.firstName,
+    lastName: details.customer.lastName,
+    email: details.customer.email,
+    phoneNumber: details.customer.phoneNumber,
     createdAt: moment(item.createdAt).format("DD/MM/YYYY"),
     timestamp: moment(item.timestamp, "HH:mm:ss").format("hh:mm A"),
     points: item.points,
@@ -164,7 +190,7 @@ const CustomerDetails = ({ details }) => {
       phoneNumber: details.customer.phoneNumber,
       totalAddedPoints: details.customer.totalAddedPoints,
       totalPoints:
-        details.customer.totalAddedPoints -
+        details.customer.totalAddedPoints +
         details.customer.totalRedeemedPoints,
       agreePromotionalEmails: details.customer.agreePromotionalEmails
         ? "Yes"
@@ -223,7 +249,7 @@ const CustomerDetails = ({ details }) => {
         <div className="flex items-center">
           <p className="text-sm font-bold">Reward Points Available:</p>
           <p className="text-sm ml-2 text-gray-800">
-            {details.customer.totalAddedPoints -
+            {details.customer.totalAddedPoints +
               details.customer.totalRedeemedPoints}
           </p>
         </div>
@@ -257,15 +283,17 @@ const CustomerDetails = ({ details }) => {
                 <div className="font-semibold">
                   <p>Rewards Point Table</p>
                 </div>
-                <Button>
-                  <CSVLink
-                    data={dataForExport}
-                    headers={headers}
-                    filename="reward_points.csv"
-                  >
-                    Download
-                  </CSVLink>
+                <Button onClick={handleDownload} variant={downloading ? 'disabled' : ''} className="text-white bg-indigo-600">
+                  {downloading ? 'Downloading...' : 'Download'}
                 </Button>
+                <CSVLink
+                  data={dataForExport}
+                  headers={headers}
+                  filename="reward_points.csv"
+                  ref={csvLink}
+                  className="hidden"
+                  target="_blank"
+                />
               </div>
             )}
             scroll={{ y: 240 }}

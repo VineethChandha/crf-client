@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import pizza from "../../assets/images/pizza.jpg";
 import Input from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ToastNotificationContainer from "../../components/ToastContainer/ToastContainer";
 
 const Login = () => {
@@ -18,6 +18,15 @@ const Login = () => {
   const bgImage = pizza;
 
   const navigate = useNavigate();
+
+  const location = useLocation();
+  console.log("Location:", location);
+
+  useEffect(() => {
+    if (location.state?.message) {
+      toast.success(location.state.message);
+    }
+  }, [location]);
 
   const handleLogin = async (data) => {
     try {
@@ -87,21 +96,19 @@ const Login = () => {
         <div className="flex justify-center mb-6">
           <button
             onClick={() => setActiveTab("ProductAdmin")}
-            className={`px-4 py-2 ${
-              activeTab === "ProductAdmin"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-800"
-            } rounded-l font-medium`}
+            className={`px-4 py-2 ${activeTab === "ProductAdmin"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-200 text-gray-800"
+              } rounded-l font-medium`}
           >
             Product Admin
           </button>
           <button
             onClick={() => setActiveTab("RestaurantAdmin")}
-            className={`px-4 py-2 ${
-              activeTab === "RestaurantAdmin"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-800"
-            } rounded-r font-medium`}
+            className={`px-4 py-2 ${activeTab === "RestaurantAdmin"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-200 text-gray-800"
+              } rounded-r font-medium`}
           >
             Restaurant Admin
           </button>

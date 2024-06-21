@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ProductNavbar from "../../../components/ProductNavbar/ProductNavbar";
 import { Table, Spin, Alert, Modal, Form, Input, Select } from "antd";
 import axios from "axios";
@@ -8,7 +8,6 @@ import AddCustomerForm from "../../../components/AddCustomer/AddCustomer";
 import CustomerDetails from "../../../components/CustomerDetails/CustomerDetails";
 import { FaEdit, FaEye, FaMinus, FaPlus, FaTrash } from "react-icons/fa";
 import { MdOutlineAdd } from "react-icons/md";
-import { CSVLink } from "react-csv";
 import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
@@ -19,7 +18,6 @@ function ProductAdminCustomer() {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -278,7 +276,7 @@ function ProductAdminCustomer() {
     }
   };
 
-  const fetchCustomers = async () => {
+  const fetchCustomers = useCallback(async () => {
     try {
       const restaurantId = localStorage.getItem("restaurantId");
       const token = localStorage.getItem("accessToken");
@@ -299,17 +297,16 @@ function ProductAdminCustomer() {
 
       setData(response.data.data);
       setTotal(response.data.total);
-      setTotalPages(response.data.totalPages);
       setLoading(false);
     } catch (err) {
       setError(err.message);
       setLoading(false);
     }
-  };
+  }, [page, searchTerm]);
 
   useEffect(() => {
     fetchCustomers();
-  }, [page, searchTerm]);
+  }, [page, searchTerm, fetchCustomers]);
 
   if (loading) {
     return (
@@ -330,7 +327,7 @@ function ProductAdminCustomer() {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="relative z-10 px-[48px] py-[20px]">
-        <ProductNavbar />
+        <ProductNavbar onSearch={setSearchTerm} />
         <button
           className="flex items-center text-[#1f2937] hover:text-gray-900 mt-4 font-semibold cursor-pointer"
           onClick={() => navigate(-1)}
@@ -364,23 +361,6 @@ function ProductAdminCustomer() {
           />
         )}
       </Modal>
-
-      {/* <Modal
-        title="Customer Details"
-        visible={detailModalOpen}
-        onOk={() => setDetailModalOpen(false)}
-        onCancel={() => setDetailModalOpen(false)}
-        footer={null}
-        width={1000}
-      >
-        <div className="w-full flex justify-end">
-          <Button
-            className="w-1/5"
-            children="Download"
-          />
-        </div>
-        <CustomerDetails details={customerDetails} />
-      </Modal> */}
 
       <Modal
         title={

@@ -10,8 +10,8 @@ const apiUrl = process.env.REACT_APP_API_BASE_URL;
 function ViewCustomer() {
   const [viewCustomer, setViewCustomer] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [page] = useState(1);
+  const [searchTerm] = useState("");
 
   const handleView = async (id) => {
     setLoading(true);
@@ -42,6 +42,7 @@ function ViewCustomer() {
     if (id) {
       handleView(id);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

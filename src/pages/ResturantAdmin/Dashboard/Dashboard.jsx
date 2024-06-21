@@ -19,7 +19,6 @@ function Dashboard() {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -286,7 +285,7 @@ function Dashboard() {
           page: p,
           limit: limit,
           restaurantId: restaurantId,
-          name: searchTerm,
+          phone: searchTerm,
         },
         {
           headers: {
@@ -302,7 +301,6 @@ function Dashboard() {
 
       setData(response.data.data);
       setTotal(response.data.total);
-      setTotalPages(response.data.totalPages);
       setLoading(false);
     } catch (err) {
       setError(err.message);
@@ -321,6 +319,8 @@ function Dashboard() {
     { label: "State", key: "state" },
     { label: "City", key: "city" },
     { label: "Zipcode", key: "zipCode" },
+    { label: "Total Reward Added", key: "totalAddedPoints" },
+    { label: "Reward Points Available", key: "totalPoints" },
     { label: "Agree Data Sharing", key: "agreeDataSharing" },
     { label: "Agree Promotional Emails", key: "agreePromotionalEmails" },
     { label: "Registered On", key: "createdAt" }
@@ -337,6 +337,10 @@ function Dashboard() {
     state: details.state,
     city: details.city,
     zipCode: details.zipCode,
+    totalAddedPoints: details.totalAddedPoints,
+    totalPoints:
+      details.totalAddedPoints +
+      details.totalRedeemedPoints,
     agreeDataSharing: details.agreeDataSharing ? "Yes" : "No",
     agreePromotionalEmails: details.agreePromotionalEmails
       ? "Yes"
@@ -368,6 +372,7 @@ function Dashboard() {
 
   useEffect(() => {
     fetchCustomers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, searchTerm]);
 
   if (loading) {

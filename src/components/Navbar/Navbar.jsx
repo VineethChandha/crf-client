@@ -32,7 +32,7 @@ function Navbar({ onSearch }) {
             type="text"
             value={searchTerm}
             onChange={handleChange}
-            placeholder="Search..."
+            placeholder="Search by phone number"
             className="w-full p-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

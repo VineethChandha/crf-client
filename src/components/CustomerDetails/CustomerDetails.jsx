@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Table, Modal, Form, Input, Select } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios";
 import moment from "moment";
 import Button from "../../components/Button/Button.jsx";
@@ -19,7 +18,7 @@ const CustomerDetails = ({ details }) => {
   const [downloading, setDownloading] = useState(false);
   const csvLink = useRef(null);
 
-  const fetchRewardPoints = async (
+  const fetchRewardPoints = useCallback(async (
     p = page,
     limit = 5,
     isFromDownload = false
@@ -52,7 +51,7 @@ const CustomerDetails = ({ details }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [details.customer._id, page, rewardPoints]);
 
   const handleDownload = async () => {
     setDownloading(true);
@@ -71,7 +70,7 @@ const CustomerDetails = ({ details }) => {
     if (details) {
       fetchRewardPoints();
     }
-  }, [page, details]);
+  }, [page, details, fetchRewardPoints]);
 
   useEffect(() => {
     if (totalData.length > 0 && csvLink.current) {

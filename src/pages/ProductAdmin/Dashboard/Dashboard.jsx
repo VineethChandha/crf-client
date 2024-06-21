@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { Modal, Table, message, Tag } from "antd";
 import {
@@ -10,8 +10,6 @@ import {
 import ProductNavbar from "../../../components/ProductNavbar/ProductNavbar";
 import Button from "../../../components/Button/Button";
 import AddRestaurantForm from "../../../components/AddResturants/AddResturants";
-import CustomerDetails from "../../../components/CustomerDetails/CustomerDetails";
-import moment from "moment";
 import ProductCustomerDetails from "../../../components/ProductCustomerDetails.jsx/ProductCustomerDetails";
 import { useNavigate } from 'react-router-dom';
 
@@ -27,15 +25,12 @@ const Dashboard = () => {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isCustomersModalOpen, setIsCustomersModalOpen] = useState(false);
   const [editRestaurant, setEditRestaurant] = useState(null);
-  const [viewRestaurant, setViewRestaurant] = useState(null);
+  const [viewRestaurant] = useState(null);
   const [customers, setCustomers] = useState([]);
-  const [totalPages, setTotalPages] = useState(0);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [error, setError] = useState(null);
 
   const navigate = useNavigate();
 
-  const fetchRestaurants = async (searchTerm, currentPage = page) => {
+  const fetchRestaurants = useCallback(async (searchTerm, currentPage = page) => {
     setLoading(true);
     try {
       const sessionToken = localStorage.getItem("accessToken");
@@ -64,7 +59,7 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page]);
 
   const showModal = () => {
     setEditRestaurant(null);
@@ -148,7 +143,7 @@ const Dashboard = () => {
         setLoading(true);
         try {
           const sessionToken = localStorage.getItem("accessToken");
-          const response = await axios.delete(
+          await axios.delete(
             `${apiUrl}/productAdmin/deleteRestaurant/${restaurantId}`,
             {
               headers: {
@@ -176,36 +171,10 @@ const Dashboard = () => {
     deleteRestaurantApi(restaurantId);
   };
 
-  const handleView = () => {
+  const handleView = (id) => {
+    localStorage.setItem("restaurantId", id);
     navigate('/product-admin/view-resturants');
   }
-
-  // const handleView = async (id) => {
-  //   setLoading(true);
-  //   try {
-  //     const sessionToken = localStorage.getItem("accessToken");
-  //     const response = await axios.post(
-  //       `${apiUrl}/productAdmin/getRestaurant`,
-  //       { id },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${sessionToken}`,
-  //         },
-  //       }
-  //     );
-  //     if (response.status === 200) {
-  //       setViewRestaurant(response.data.restaurantData);
-  //       setIsDetailsModalOpen(true);
-  //     } else {
-  //       message.error("Failed to fetch restaurant details");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching restaurant details:", error);
-  //     message.error("An error occurred while fetching restaurant details");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const handleViewCustomers = async (restaurantId) => {
     setLoading(true);
@@ -217,7 +186,6 @@ const Dashboard = () => {
           page: page,
           limit: 10,
           restaurantId: restaurantId,
-          phone: searchTerm,
         },
         {
           headers: {
@@ -229,10 +197,8 @@ const Dashboard = () => {
       setCustomers(response.data.data);
       setIsCustomersModalOpen(true);
       setTotal(response.data.total);
-      setTotalPages(response.data.totalPages);
       setLoading(false);
     } catch (err) {
-      setError(err.message);
       setLoading(false);
     }
   };
@@ -245,7 +211,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchRestaurants(searchedValue);
-  }, [searchedValue, page]);
+  }, [searchedValue, page, fetchRestaurants]);
 
   const columns = [
     {

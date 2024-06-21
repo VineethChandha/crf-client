@@ -18,7 +18,7 @@ function ViewRestaurants() {
     try {
       const sessionToken = localStorage.getItem("accessToken");
       const response = await axios.post(
-        `${apiUrl}/productAdmin/getRestaurant`,
+        `${apiUrl}/common/getRestaurant`,
         { id },
         {
           headers: {

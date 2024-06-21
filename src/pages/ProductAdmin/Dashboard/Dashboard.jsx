@@ -40,7 +40,7 @@ const Dashboard = () => {
     try {
       const sessionToken = localStorage.getItem("accessToken");
       const response = await axios.post(
-        `${apiUrl}/productAdmin/getRestaurants`,
+        `${apiUrl}/common/getRestaurants`,
         {
           page: currentPage,
           limit: 10,

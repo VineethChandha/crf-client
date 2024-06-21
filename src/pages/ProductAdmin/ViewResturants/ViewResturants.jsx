@@ -93,9 +93,8 @@ function ViewRestaurants() {
         <div className="flex space-x-4">
           <CSVLink
             data={csvData}
-            filename={`${
-              viewRestaurant.restaurantName || "restaurant"
-            }_data.csv`}
+            filename={`${viewRestaurant.restaurantName || "restaurant"
+              }_data.csv`}
           >
             <Button>Download Data</Button>
           </CSVLink>
@@ -145,7 +144,7 @@ function ViewRestaurants() {
                 </div>
                 <div className="text-sm font-medium text-gray-700">
                   <span className="font-semibold text-gray-900">
-                    Redeem Points : {viewRestaurant.redeemedPoints}
+                    Redeem Points : {Math.abs(viewRestaurant.redeemedPoints)}
                   </span>
                 </div>
                 <div className="text-sm font-medium text-gray-700">

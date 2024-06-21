@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Table, Modal, Form, Input, Select } from "antd";
 import axios from "axios";
 import moment from "moment";
@@ -18,7 +18,7 @@ const CustomerDetails = ({ details }) => {
   const [downloading, setDownloading] = useState(false);
   const csvLink = useRef(null);
 
-  const fetchRewardPoints = useCallback(async (
+  const fetchRewardPoints = async (
     p = page,
     limit = 5,
     isFromDownload = false
@@ -51,7 +51,7 @@ const CustomerDetails = ({ details }) => {
     } finally {
       setLoading(false);
     }
-  }, [details.customer._id, page, rewardPoints]);
+  };
 
   const handleDownload = async () => {
     setDownloading(true);
@@ -70,7 +70,8 @@ const CustomerDetails = ({ details }) => {
     if (details) {
       fetchRewardPoints();
     }
-  }, [page, details, fetchRewardPoints]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, details]);
 
   useEffect(() => {
     if (totalData.length > 0 && csvLink.current) {

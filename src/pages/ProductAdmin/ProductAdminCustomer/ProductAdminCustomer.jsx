@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ProductNavbar from "../../../components/ProductNavbar/ProductNavbar";
 import { Table, Spin, Alert, Modal, Form, Input, Select } from "antd";
 import axios from "axios";
@@ -10,6 +10,7 @@ import { FaEdit, FaEye, FaMinus, FaPlus, FaTrash } from "react-icons/fa";
 import { MdOutlineAdd } from "react-icons/md";
 import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import { CSVLink } from "react-csv";
 const apiUrl = process.env.REACT_APP_API_BASE_URL;
 
 function ProductAdminCustomer() {
@@ -26,6 +27,10 @@ function ProductAdminCustomer() {
   const [customerDetails, setCustomerDetails] = useState(null);
   const [rewardModalOpen, setRewardModalOpen] = useState(false);
   const [form] = Form.useForm();
+
+  const [allCustomersData, setAllCustomersData] = useState([]);
+  const [downloading, setDownloading] = useState(false);
+  const csvLink = useRef(null);
 
   const navigate = useNavigate();
 
@@ -276,15 +281,15 @@ function ProductAdminCustomer() {
     }
   };
 
-  const fetchCustomers = useCallback(async () => {
+  const fetchCustomers = async (p = page, limit = 10, fetchAllCustomers = false) => {
     try {
       const restaurantId = localStorage.getItem("restaurantId");
       const token = localStorage.getItem("accessToken");
       const response = await axios.post(
         `${apiUrl}/common/getCustomers`,
         {
-          page: page,
-          limit: 10,
+          page: p,
+          limit: limit,
           restaurantId: restaurantId,
           phone: searchTerm,
         },
@@ -295,6 +300,11 @@ function ProductAdminCustomer() {
         }
       );
 
+      if (fetchAllCustomers) {
+        setAllCustomersData(response.data.data);
+        return;
+      }
+
       setData(response.data.data);
       setTotal(response.data.total);
       setLoading(false);
@@ -302,11 +312,68 @@ function ProductAdminCustomer() {
       setError(err.message);
       setLoading(false);
     }
-  }, [page, searchTerm]);
+  };
 
   useEffect(() => {
     fetchCustomers();
-  }, [page, searchTerm, fetchCustomers]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, searchTerm]);
+
+  const customerHeaders = [
+    { label: "First Name", key: "firstName" },
+    { label: "Last Name", key: "lastName" },
+    { label: "Gender", key: "gender" },
+    { label: "Email", key: "email" },
+    { label: "Phone Number", key: "phoneNumber" },
+    { label: "Date of Birth", key: "dob" },
+    { label: "Address", key: "address" },
+    { label: "State", key: "state" },
+    { label: "City", key: "city" },
+    { label: "Zipcode", key: "zipCode" },
+    { label: "Total Reward Added", key: "totalAddedPoints" },
+    { label: "Reward Points Available", key: "totalPoints" },
+    { label: "Agree Data Sharing", key: "agreeDataSharing" },
+    { label: "Agree Promotional Emails", key: "agreePromotionalEmails" },
+    { label: "Registered On", key: "createdAt" }
+  ];
+
+  const allCustomerDownload = allCustomersData.map((details) => ({
+    firstName: details.firstName,
+    lastName: details.lastName,
+    gender: details.gender[0],
+    email: details.email,
+    phoneNumber: details.phoneNumber,
+    dob: moment(details.dob).format("DD/MM/YYYY"),
+    address: details.address,
+    state: details.state,
+    city: details.city,
+    zipCode: details.zipCode,
+    totalAddedPoints: details.totalAddedPoints,
+    totalPoints:
+      details.totalAddedPoints +
+      details.totalRedeemedPoints,
+    agreeDataSharing: details.agreeDataSharing ? "Yes" : "No",
+    agreePromotionalEmails: details.agreePromotionalEmails
+      ? "Yes"
+      : "No",
+    createdAt: moment(details.createdAt).format("DD/MM/YYYY"),
+  }));
+
+  const handleDownload = async () => {
+    setDownloading(true);
+    try {
+      fetchCustomers(1, 2000, true);
+    } catch (error) {
+      console.error("Error downloading reward points:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (allCustomersData.length > 0 && csvLink.current) {
+      csvLink.current.link.click();
+      setDownloading(false);
+    }
+  }, [allCustomersData]);
 
   if (loading) {
     return (
@@ -411,7 +478,18 @@ function ProductAdminCustomer() {
         <div>
           <h3 className="font-medium text-lg mb-4">Customers Details</h3>
         </div>
-        <div>
+        <div className="flex gap-3">
+          <Button onClick={handleDownload} variant={downloading ? 'disabled' : ''} className="text-white bg-indigo-600">
+            {downloading ? 'Downloading...' : 'Download'}
+          </Button>
+          <CSVLink
+            data={allCustomerDownload}
+            headers={customerHeaders}
+            filename="all_customers.csv"
+            ref={csvLink}
+            className="hidden"
+            target="_blank"
+          />
           <Button onClick={showModal} >
             <MdOutlineAdd size={20} className="mr-[4px] font-semibold" />
             Add customer

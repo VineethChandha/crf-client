@@ -81,21 +81,7 @@ const AddRestaurantForm = ({ onSubmit, onCancel, initialData }) => {
       agreementAccepted: formData.agreeTerms,
       isAccepted: true,
     };
-    onSubmit(payload).then(() => {
-      setFormData({
-        restaurantName: "",
-        address: "",
-        LLC: "",
-        phoneNumber: "",
-        email: "",
-        ownerName: "",
-        password: "",
-        primaryContactName: "",
-        primaryContactAddress: "",
-        primaryContactEmail: "",
-        agreeTerms: false,
-      });
-    });
+    onSubmit(payload, setFormData);
   };
 
   return (

@@ -53,8 +53,8 @@ const AddCustomerForm = ({ onSubmit, onCancel, initialData }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
-  };
+    onSubmit(formData, setFormData);
+  }
 
   return (
     <form

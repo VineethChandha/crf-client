@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import ProductNavbar from "../../../components/ProductNavbar/ProductNavbar";
-import { Table, Spin, Alert, Modal, Form, Input, Select } from "antd";
+import { Table, Spin, Alert, Modal, Form, Input, Select, message } from "antd";
 import axios from "axios";
 import moment from "moment";
 import Button from "../../../components/Button/Button";
@@ -242,7 +242,7 @@ function ProductAdminCustomer() {
     },
   ];
 
-  const handleAddCustomer = async (customerData) => {
+  const handleAddCustomer = async (customerData, setFormData = []) => {
     try {
       const restaurantId = localStorage.getItem("restaurantId");
       const token = localStorage.getItem("accessToken");
@@ -263,15 +263,32 @@ function ProductAdminCustomer() {
       );
 
       if (response.status === 200) {
+        message.success("Customer added successfully");
         setIsModalOpen(false);
         fetchCustomers();
+        setFormData({
+          firstName: "",
+          lastName: "",
+          gender: "",
+          dob: "",
+          phoneNumber: "",
+          email: "",
+          address: "",
+          city: "",
+          state: "",
+          zipCode: "",
+          agreePromotionalEmails: false,
+          agreeDataSharing: false,
+        });
       } else {
+        message.error(response.data.message || "Failed to add customer");
         console.error(`Error: ${response.status} - ${response.statusText}`);
       }
     } catch (err) {
       if (err.response) {
+        message.error(err.response.data.error || "An error occurred while adding customer");
         console.error(
-          `Server Error: ${err.response.status} - ${err.response.data.message}`
+          `Server Error: ${err.response.status} - ${err.response.data.error}`
         );
       } else if (err.request) {
         console.error("No response received:", err.request);

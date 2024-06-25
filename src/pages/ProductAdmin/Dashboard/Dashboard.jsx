@@ -75,7 +75,7 @@ const Dashboard = () => {
     setIsModalOpen(false);
   };
 
-  const addRestaurant = async (restaurantData) => {
+  const addRestaurant = async (restaurantData, setFormData) => {
     setLoading(true);
     try {
       const sessionToken = localStorage.getItem("accessToken");
@@ -88,16 +88,31 @@ const Dashboard = () => {
           },
         }
       );
-      if (response.data && response.data.success) {
+      console.log(response);
+      if (response.data && response.status === 201) {
         message.success("Restaurant added successfully");
         setIsModalOpen(false);
         fetchRestaurants(searchedValue);
+        setFormData({
+          restaurantName: "",
+          address: "",
+          LLC: "",
+          phoneNumber: "",
+          email: "",
+          ownerName: "",
+          password: "",
+          primaryContactName: "",
+          primaryContactAddress: "",
+          primaryContactEmail: "",
+          agreeTerms: false,
+        });
       } else {
-        message.success(response.data.message || "Failed to add restaurant");
+        message.error(response.data.message || "Failed to add restaurant");
         setIsModalOpen(false);
         fetchRestaurants(searchedValue);
       }
     } catch (error) {
+      console.log(error);
       message.error(error.response.data.error || "An error occurred while adding restaurant");
     } finally {
       setLoading(false);
@@ -332,10 +347,10 @@ const Dashboard = () => {
         footer={null}
       >
         <AddRestaurantForm
-          onSubmit={(data) =>
+          onSubmit={(data, setFormData) =>
             editRestaurant
               ? editRestaurantApi(data, editRestaurant._id)
-              : addRestaurant(data)
+              : addRestaurant(data, setFormData)
           }
           onCancel={handleCancel}
           initialData={editRestaurant ? editRestaurant : ""}

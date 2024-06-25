@@ -241,8 +241,6 @@ function Dashboard() {
       const restaurantId = localStorage.getItem("restaurantId");
       const token = localStorage.getItem("accessToken");
 
-      console.log("Sending data:", { ...customerData, restaurantId });
-
       const response = await axios.post(
         `${apiUrl}/restaurantAdmin/addCustomer`,
         {
@@ -268,13 +266,15 @@ function Dashboard() {
       console.log(err);
       if (err.response) {
         console.error(
-          `Server Error: ${err.response.status} - ${err.response.data.error}`
+          `Server Error: ${err.response.status} - ${err.response.data.message}`
         );
-        toast.error(err.response.data.error);
+        toast.error(err.response.data.message || "Failed to add customer");
       } else if (err.request) {
         console.error("No response received:", err.request);
+        toast.error("No response received from the server");
       } else {
         console.error("Error", err.message);
+        toast.error(err.message);
       }
     }
   };

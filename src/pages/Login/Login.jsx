@@ -45,6 +45,7 @@ const Login = () => {
 
       if (response.data.success) {
         localStorage.setItem("accessToken", response.data.token);
+        console.log(response.data);
 
         if (response.data.restaurantAdmin) {
           localStorage.setItem(

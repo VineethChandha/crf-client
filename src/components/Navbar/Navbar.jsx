@@ -21,7 +21,7 @@ function Navbar({ onSearch }) {
     onSearch(value.trim()); 
   };
 
-  const username = localStorage.getItem("usename");
+  const username = localStorage.getItem("username");
 
   return (
     <div className="bg-white bg-opacity-80 border border-gray-200 shadow-lg rounded-lg px-6 py-4 flex justify-between items-center">

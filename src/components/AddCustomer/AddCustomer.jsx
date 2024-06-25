@@ -122,6 +122,10 @@ const AddCustomerForm = ({ onSubmit, onCancel, initialData }) => {
             value={formData.phoneNumber}
             onChange={handleChange}
             required
+            minLength={10}
+            maxLength={10}
+            pattern="\d{10,}"
+            title="Enter a valid phone number with 10 digits."
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           />
         </div>

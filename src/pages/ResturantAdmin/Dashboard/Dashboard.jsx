@@ -26,6 +26,8 @@ function Dashboard() {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [customerDetails, setCustomerDetails] = useState(null);
   const [rewardModalOpen, setRewardModalOpen] = useState(false);
+  const [viewRestaurant, setViewRestaurant] = useState({});
+  const [loadingRestaurant, setLoadingRestaurant] = useState(false);
   const [form] = Form.useForm();
 
   const [allCustomersData, setAllCustomersData] = useState([]);
@@ -375,6 +377,44 @@ function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, searchTerm]);
 
+  /**
+   * This is used to view the restaurant details.
+   * It fetches the restaurant details from the server and sets the state.
+   */
+  const handleView = async (id) => {
+    setLoading(true);
+    try {
+      const sessionToken = localStorage.getItem("accessToken");
+      const response = await axios.post(
+        `${apiUrl}/common/getRestaurant`,
+        { id },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionToken}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        console.log("Restaurant Data:", response.data.restaurantData);
+        setViewRestaurant(response.data.restaurantData);
+      } else {
+        toast.error("Failed to fetch restaurant details");
+      }
+    } catch (error) {
+      console.error("Error fetching restaurant details:", error);
+      toast.error("An error occurred while fetching restaurant details");
+    } finally {
+      setLoadingRestaurant(false);
+    }
+  };
+
+  useEffect(() => {
+    const id = localStorage.getItem("restaurantId");
+    if (id) {
+      handleView(id);
+    }
+  }, []);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -423,22 +463,65 @@ function Dashboard() {
         )}
       </Modal>
 
-      {/* <Modal
-        title="Customer Details"
-        visible={detailModalOpen}
-        onOk={() => setDetailModalOpen(false)}
-        onCancel={() => setDetailModalOpen(false)}
-        footer={null}
-        width={1000}
-      >
-        <div className="w-full flex justify-end">
-          <Button
-            className="w-1/5"
-            children="Download"
-          />
+      <div className="px-[48px] flex items-center justify-between my-4">
+        <h3 className="text-[18px] font-semibold text-gray-800">
+          Restaurant Details
+        </h3>
+      </div>
+      {loadingRestaurant ? (
+        <div className="flex justify-center items-center">
+          <Spin size="large" />
         </div>
-        <CustomerDetails details={customerDetails} />
-      </Modal> */}
+      ) : (
+        viewRestaurant && (
+          <div className="px-[48px] mb-6">
+            <div className="bg-white shadow-lg rounded-lg p-6 border border-gray-300">
+              <div className="grid grid-cols-3 gap-6 border-gray-200">
+                <div className="text-sm font-medium text-gray-700">
+                  <span className="font-semibold text-gray-900">
+                    Restaurant Name : {viewRestaurant.restaurantName}
+                  </span>
+                </div>
+                <div className="text-sm font-medium text-gray-700">
+                  <span className="font-semibold text-gray-900">
+                    Phone : {viewRestaurant.phoneNumber}
+                  </span>
+                </div>
+                <div className="text-sm font-medium text-gray-700">
+                  <span className="font-semibold text-gray-900">
+                    Resturant Address : {viewRestaurant.address}
+                  </span>
+                </div>
+                <div className="text-sm font-medium text-gray-700">
+                  <span className="font-semibold text-gray-900">
+                    Email : {viewRestaurant.email}
+                  </span>
+                </div>
+                <div className="text-sm font-medium text-gray-700">
+                  <span className="font-semibold text-gray-900">
+                    LLC : {viewRestaurant.llc}
+                  </span>
+                </div>
+                <div className="text-sm font-medium text-gray-700">
+                  <span className="font-semibold text-gray-900">
+                    Owner Name : {viewRestaurant.ownerName}
+                  </span>
+                </div>
+                <div className="text-sm font-medium text-gray-700">
+                  <span className="font-semibold text-gray-900">
+                    Redeem Points : {Math.abs(viewRestaurant.redeemedPoints)}
+                  </span>
+                </div>
+                <div className="text-sm font-medium text-gray-700">
+                  <span className="font-semibold text-gray-900">
+                    Total Points : {viewRestaurant.totalPoints}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      )}
 
       <Modal
         title={

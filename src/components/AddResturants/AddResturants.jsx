@@ -15,9 +15,25 @@ const AddRestaurantForm = ({ onSubmit, onCancel, initialData }) => {
     primaryContactEmail: "",
     agreeTerms: false,
   });
+  const [termsError, setTermsError] = useState(false);
 
   useEffect(() => {
-    if (initialData) {
+    if (initialData === "") {
+      setFormData({
+        restaurantName: "",
+        address: "",
+        LLC: "",
+        phoneNumber: "",
+        email: "",
+        ownerName: "",
+        password: "",
+        primaryContactName: "",
+        primaryContactAddress: "",
+        primaryContactEmail: "",
+        agreeTerms: false,
+      });
+    }
+    else if (initialData) {
       setFormData({
         restaurantName: initialData.restaurantName || "",
         address: initialData.address || "",
@@ -36,6 +52,7 @@ const AddRestaurantForm = ({ onSubmit, onCancel, initialData }) => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    if (name === "agreeTerms") setTermsError(!termsError);
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? checked : value,
@@ -44,6 +61,10 @@ const AddRestaurantForm = ({ onSubmit, onCancel, initialData }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!formData.agreeTerms) {
+      setTermsError(true);
+      return;
+    }
     const payload = {
       restaurantName: formData.restaurantName,
       address: formData.address,
@@ -60,7 +81,21 @@ const AddRestaurantForm = ({ onSubmit, onCancel, initialData }) => {
       agreementAccepted: formData.agreeTerms,
       isAccepted: true,
     };
-    onSubmit(payload);
+    onSubmit(payload).then(() => {
+      setFormData({
+        restaurantName: "",
+        address: "",
+        LLC: "",
+        phoneNumber: "",
+        email: "",
+        ownerName: "",
+        password: "",
+        primaryContactName: "",
+        primaryContactAddress: "",
+        primaryContactEmail: "",
+        agreeTerms: false,
+      });
+    });
   };
 
   return (
@@ -112,6 +147,10 @@ const AddRestaurantForm = ({ onSubmit, onCancel, initialData }) => {
             value={formData.phoneNumber}
             onChange={handleChange}
             required
+            minLength={10}
+            maxLength={10}
+            pattern="\d{10,}"
+            title="Enter a valid phone number with 10 digits."
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           />
         </div>
@@ -188,7 +227,7 @@ const AddRestaurantForm = ({ onSubmit, onCancel, initialData }) => {
           />
         </div>
       </div>
-      <div className="mb-4">
+      <div className="mb-2">
         <label className="flex items-center">
           <input
             type="checkbox"
@@ -202,7 +241,10 @@ const AddRestaurantForm = ({ onSubmit, onCancel, initialData }) => {
           </span>
         </label>
       </div>
-      <div className="flex justify-between gap-4">
+      {termsError && (
+        <p className="text-red-500 text-sm mb-2">Please accept terms and condition to proceed.</p>
+      )}
+      <div className="flex justify-between gap-4 mt-4">
         <Button type="submit">
           {initialData ? "Edit Restaurant" : "Add Restaurant"}
         </Button>

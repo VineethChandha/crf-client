@@ -71,6 +71,7 @@ const Dashboard = () => {
   };
 
   const handleCancel = () => {
+    setEditRestaurant(null);
     setIsModalOpen(false);
   };
 
@@ -116,7 +117,8 @@ const Dashboard = () => {
           },
         }
       );
-      if (response.data && response.data.success) {
+      console.log(response.data, response.status === 200);
+      if (response.data && response.status === 200) {
         message.success("Restaurant edited successfully");
         setIsModalOpen(false);
         fetchRestaurants(searchedValue);
@@ -131,6 +133,38 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+
+  const updateRestaurantStatus = async (restaurantId, status) => {
+    try {
+      const sessionToken = localStorage.getItem("accessToken");
+      const response = await axios.post(
+        `${apiUrl}/productAdmin/updateRestaurant`,
+        {
+          restaurantId,
+          status
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionToken}`,
+          },
+        }
+      );
+      console.log(response.data, response.status === 200);
+      if (response.data && response.status === 200) {
+        message.success("Restaurant edited successfully");
+        setIsModalOpen(false);
+        fetchRestaurants(searchedValue);
+      } else {
+        message.error(response.data.message || "Failed to edit restaurant");
+        setIsModalOpen(false);
+        fetchRestaurants(searchedValue);
+      }
+    } catch (error) {
+      message.error("An error occurred while editing restaurant");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const deleteRestaurantApi = async (restaurantId) => {
     Modal.confirm({
@@ -238,11 +272,31 @@ const Dashboard = () => {
       title: "Status",
       dataIndex: "isAccepted",
       key: "isAccepted",
-      render: (isAccepted) => (
-        <Tag color={isAccepted ? "green" : "red"}>
-          {isAccepted ? "Accepted" : "Not Accepted"}
-        </Tag>
-      ),
+      // render: (isAccepted) => (
+      //   <Tag color={isAccepted ? "green" : "red"}>
+      //     {isAccepted ? "Accepted" : "Not Accepted"}
+      //   </Tag>
+      // ),
+      render: (isAccepted, data, record) => {
+        if (data.isAccepted) {
+          return <Tag color="green">Accepted</Tag>;
+        }
+        if (data.isRejected === false && data.isAccepted === false) {
+          return (
+            <div className="flex gap-2">
+              <Button className="bg-green-600 hover:bg-green-500 px-2.5 py-1.5 focus:ring-0 focus:ring-offset-2" onClick={() => updateRestaurantStatus(data._id, "accept")}>
+                Accept
+              </Button>
+              <Button className="bg-red-600 hover:bg-red-500 px-2.5 py-1.5 focus:ring-0 focus:ring-offset-2" onClick={() => updateRestaurantStatus(data._id, "reject")}>
+                Reject
+              </Button>
+            </div>
+          );
+        }
+        if (data.isRejected) {
+          return <Tag color="red">Not Accepted</Tag>;
+        }
+      },
     },
     {
       title: "Action",
@@ -286,7 +340,7 @@ const Dashboard = () => {
               : addRestaurant(data)
           }
           onCancel={handleCancel}
-          initialData={editRestaurant}
+          initialData={editRestaurant ? editRestaurant : ""}
         />
       </Modal>
       <Modal

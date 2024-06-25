@@ -52,7 +52,7 @@ const AddRestaurantForm = ({ onSubmit, onCancel, initialData }) => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    if (name === "agreeTerms") setTermsError(!termsError);
+    if (name === "agreeTerms") setTermsError(!checked);
     setFormData({
       ...formData,
       [name]: type === "checkbox" ? checked : value,

@@ -259,8 +259,10 @@ function Dashboard() {
       if (response.status === 200) {
         setIsModalOpen(false);
         fetchCustomers();
+        toast.success("Customer added successfully");
       } else {
         console.error(`Error: ${response.status} - ${response.statusText}`);
+        toast.error("Failed to add customer");
       }
     } catch (err) {
       console.log(err);

@@ -117,7 +117,6 @@ const Dashboard = () => {
           },
         }
       );
-      console.log(response.data, response.status === 200);
       if (response.data && response.status === 200) {
         message.success("Restaurant edited successfully");
         setIsModalOpen(false);
@@ -149,7 +148,6 @@ const Dashboard = () => {
           },
         }
       );
-      console.log(response.data, response.status === 200);
       if (response.data && response.status === 200) {
         message.success("Restaurant edited successfully");
         setIsModalOpen(false);

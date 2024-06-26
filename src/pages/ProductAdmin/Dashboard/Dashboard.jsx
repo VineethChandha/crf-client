@@ -88,7 +88,6 @@ const Dashboard = () => {
           },
         }
       );
-      console.log(response);
       if (response.data && response.status === 201) {
         message.success("Restaurant added successfully");
         setIsModalOpen(false);

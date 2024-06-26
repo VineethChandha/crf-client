@@ -165,12 +165,15 @@ function ProductAdminCustomer() {
         );
 
         if (response.status === 200) {
+          message.success(response.data.message);
           setRewardModalOpen(false);
           form.resetFields();
         } else {
+          message.error(response.data.message || "Failed to perform action");
           console.error(`Error: ${response.status} - ${response.statusText}`);
         }
       } catch (error) {
+        message.error(error.response.data.error)
         console.error("Error adding reward points:", error);
       }
     });
@@ -246,8 +249,6 @@ function ProductAdminCustomer() {
     try {
       const restaurantId = localStorage.getItem("restaurantId");
       const token = localStorage.getItem("accessToken");
-
-      console.log("Sending data:", { ...customerData, restaurantId });
 
       const response = await axios.post(
         `${apiUrl}/restaurantAdmin/addCustomer`,
@@ -470,6 +471,7 @@ function ProductAdminCustomer() {
           style: { backgroundColor: "#4f46e5", color: "white" },
         }}
       >
+        <p className="pb-2 font-semibold text-center">Total available points: {selectedCustomer?.totalPoints}</p>
         <Form form={form} layout="vertical">
           <Form.Item
             name="points"

@@ -159,12 +159,16 @@ function Dashboard() {
         );
 
         if (response.status === 200) {
+          toast.success(response.data.message);
           setRewardModalOpen(false);
           form.resetFields();
+          fetchCustomers();
         } else {
+          toast.error(response.data.message || "Failed to perform action");
           console.error(`Error: ${response.status} - ${response.statusText}`);
         }
       } catch (error) {
+        toast.error(error.response.data.error)
         console.error("Error adding reward points:", error);
       }
     });
@@ -268,7 +272,7 @@ function Dashboard() {
         console.error(
           `Server Error: ${err.response.status} - ${err.response.data.message}`
         );
-        toast.error(err.response.data.message || "Failed to add customer");
+        toast.error(err.response.data.error || "Failed to add customer");
       } else if (err.request) {
         console.error("No response received:", err.request);
         toast.error("No response received from the server");
@@ -549,6 +553,7 @@ function Dashboard() {
           style: { backgroundColor: "#4f46e5", color: "white" },
         }}
       >
+        <p className="pb-2 font-semibold text-center">Total available points: {selectedCustomer?.totalPoints}</p>
         <Form form={form} layout="vertical">
           <Form.Item
             name="points"

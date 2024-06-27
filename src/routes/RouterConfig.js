@@ -3,6 +3,8 @@
 export const ROUTES = {
   Home: "/",
   ExternalLogin: "/external-login",
+  ProductAdminLogin: "/product-admin/login",
+  RestaurantAdminLogin: "/restaurant-admin/login",
   ProductAdminDashboard: "/product-admin/dashboard",
   ViewResturants: "/product-admin/view-resturants",
   ProductAdminCustomer: "/product-admin/customer",

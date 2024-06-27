@@ -240,7 +240,7 @@ function Dashboard() {
     },
   ];
 
-  const handleAddCustomer = async (customerData) => {
+  const handleAddCustomer = async (customerData, setFormData) => {
     try {
       const restaurantId = localStorage.getItem("restaurantId");
       const token = localStorage.getItem("accessToken");
@@ -262,6 +262,20 @@ function Dashboard() {
         setIsModalOpen(false);
         fetchCustomers();
         toast.success("Customer added successfully");
+        setFormData({
+          firstName: "",
+          lastName: "",
+          gender: "",
+          dob: "",
+          phoneNumber: "",
+          email: "",
+          address: "",
+          city: "",
+          state: "",
+          zipCode: "",
+          agreePromotionalEmails: false,
+          agreeDataSharing: false,
+        })
       } else {
         console.error(`Error: ${response.status} - ${response.statusText}`);
         toast.error("Failed to add customer");
@@ -557,7 +571,7 @@ function Dashboard() {
         <Form form={form} layout="vertical">
           <Form.Item
             name="points"
-            label="Points"
+            label="Points/Bill Amount"
             rules={[{ required: true, message: "Please input points" }]}
           >
             <Input type="number" />

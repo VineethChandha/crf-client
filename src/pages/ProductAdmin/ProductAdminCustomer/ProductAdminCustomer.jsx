@@ -475,7 +475,7 @@ function ProductAdminCustomer() {
         <Form form={form} layout="vertical">
           <Form.Item
             name="points"
-            label="Points"
+            label="Points/Bill Amount"
             rules={[{ required: true, message: "Please input points" }]}
           >
             <Input type="number" />

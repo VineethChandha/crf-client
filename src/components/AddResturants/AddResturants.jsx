@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Button from "../Button/Button";
+import PhoneInput from 'react-phone-number-input'
 
 const AddRestaurantForm = ({ onSubmit, onCancel, initialData }) => {
   const [formData, setFormData] = useState({
@@ -127,7 +128,7 @@ const AddRestaurantForm = ({ onSubmit, onCancel, initialData }) => {
         </div>
         <div className="mb-4">
           <label className="block text-gray-700">Phone Number</label>
-          <input
+          {/* <input
             type="tel"
             name="phoneNumber"
             value={formData.phoneNumber}
@@ -138,6 +139,18 @@ const AddRestaurantForm = ({ onSubmit, onCancel, initialData }) => {
             pattern="\d{10,}"
             title="Enter a valid phone number with 10 digits."
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          /> */}
+
+          <PhoneInput
+            value={formData.phoneNumber}
+            onChange={(phoneNumber) => { setFormData({ ...formData, phoneNumber }) }}
+            required
+            minLength={10} // Minimum length required
+            maxLength={14} // Maximum length required
+            defaultCountry="US" // Set default country
+            // international
+            // countryCallingCodeEditable={false}
+            className="border w-full border-gray-300 mt-1 px-3 py-2 rounded-md shadow-sm !focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           />
         </div>
       </div>

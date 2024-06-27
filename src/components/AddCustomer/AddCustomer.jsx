@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Button from "../Button/Button";
+import 'react-phone-number-input/style.css'
+import PhoneInput from 'react-phone-number-input'
+import { dateFormat } from "../../utils/dateFormat";
 
 const AddCustomerForm = ({ onSubmit, onCancel, initialData }) => {
   const [formData, setFormData] = useState({
@@ -16,6 +19,8 @@ const AddCustomerForm = ({ onSubmit, onCancel, initialData }) => {
     agreePromotionalEmails: false,
     agreeDataSharing: false,
   });
+
+  console.log(initialData);
 
   useEffect(() => {
     if (initialData) {
@@ -44,6 +49,8 @@ const AddCustomerForm = ({ onSubmit, onCancel, initialData }) => {
     });
   };
 
+  console.log(dateFormat(formData.dob));
+
   const handleGenderChange = (e) => {
     setFormData({
       ...formData,
@@ -53,6 +60,7 @@ const AddCustomerForm = ({ onSubmit, onCancel, initialData }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log(formData);
     onSubmit(formData, setFormData);
   }
 
@@ -106,7 +114,7 @@ const AddCustomerForm = ({ onSubmit, onCancel, initialData }) => {
           <input
             type="date"
             name="dob"
-            value={formData.dob}
+            value={dateFormat(formData.dob)}
             onChange={handleChange}
             required
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -116,17 +124,29 @@ const AddCustomerForm = ({ onSubmit, onCancel, initialData }) => {
       <div className="grid grid-cols-2 gap-4">
         <div className="mb-4">
           <label className="block text-gray-700">Phone Number</label>
-          <input
-            type="tel"
-            name="phoneNumber"
+          {/* <input
+              type="tel"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleChange}
+              required
+              minLength={10}
+              maxLength={10}
+              pattern="\d{10,}"
+              title="Enter a valid phone number with 10 digits."
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            /> */}
+
+          <PhoneInput
             value={formData.phoneNumber}
-            onChange={handleChange}
+            onChange={(phoneNumber) => { setFormData({ ...formData, phoneNumber }) }}
             required
-            minLength={10}
-            maxLength={10}
-            pattern="\d{10,}"
-            title="Enter a valid phone number with 10 digits."
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            minLength={10} // Minimum length required
+            maxLength={14} // Maximum length required
+            defaultCountry="US" // Set default country
+            // international
+            // countryCallingCodeEditable={false}
+            className="border w-full border-gray-300 mt-1 px-3 py-2 rounded-md shadow-sm !focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           />
         </div>
         <div className="mb-4">

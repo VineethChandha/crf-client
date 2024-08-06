@@ -150,13 +150,13 @@ const RestaurantAdminLogin = () => {
                 Remember me
               </label>
             </div>
-            <div className="text-sm">
+            {/* <div className="text-sm">
               <a href="#"
                 className="font-medium text-indigo-600 hover:text-indigo-500"
               >
                 Forgot your password?
               </a>
-            </div>
+            </div> */}
           </div>
           <Button type="submit" variant="primary">
             Login

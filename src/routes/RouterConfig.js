@@ -1,4 +1,3 @@
-
 // Note: This is the file where all the routes are defined
 export const ROUTES = {
   Home: "/",

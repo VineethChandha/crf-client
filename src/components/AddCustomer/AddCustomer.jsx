@@ -2,14 +2,15 @@ import React, { useState, useEffect } from "react";
 import Button from "../Button/Button";
 import 'react-phone-number-input/style.css'
 import PhoneInput from 'react-phone-number-input'
-import { dateFormat } from "../../utils/dateFormat";
+import { DatePicker } from 'antd';
+import moment from 'moment';
 
 const AddCustomerForm = ({ onSubmit, onCancel, initialData }) => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     gender: "",
-    dob: "",
+    dob: null, 
     phoneNumber: "",
     email: "",
     address: "",
@@ -20,15 +21,13 @@ const AddCustomerForm = ({ onSubmit, onCancel, initialData }) => {
     agreeDataSharing: false,
   });
 
-  console.log(initialData);
-
   useEffect(() => {
     if (initialData) {
       setFormData({
         firstName: initialData.firstName || "",
         lastName: initialData.lastName || "",
         gender: initialData.gender || "",
-        dob: initialData.dob || "",
+        dob: initialData.dob ? moment(initialData.dob) : null, 
         phoneNumber: initialData.phoneNumber || "",
         email: initialData.email || "",
         address: initialData.address || "",
@@ -49,8 +48,6 @@ const AddCustomerForm = ({ onSubmit, onCancel, initialData }) => {
     });
   };
 
-  console.log(dateFormat(formData.dob));
-
   const handleGenderChange = (e) => {
     setFormData({
       ...formData,
@@ -58,11 +55,21 @@ const AddCustomerForm = ({ onSubmit, onCancel, initialData }) => {
     });
   };
 
+  const handleDateChange = (date) => {
+    setFormData({
+      ...formData,
+      dob: date,
+    });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
-    onSubmit(formData, setFormData);
-  }
+    const formattedData = {
+      ...formData,
+      dob: formData.dob ? formData.dob.format('YYYY-MM-DD') : null,
+    };
+    onSubmit(formattedData, setFormData);
+  };
 
   return (
     <form
@@ -111,41 +118,25 @@ const AddCustomerForm = ({ onSubmit, onCancel, initialData }) => {
         </div>
         <div className="mb-4">
           <label className="block text-gray-700">Date of Birth</label>
-          <input
-            type="date"
-            name="dob"
-            value={dateFormat(formData.dob)}
-            onChange={handleChange}
+          <DatePicker
+            value={formData.dob}
+            onChange={handleDateChange}
             required
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            format="YYYY-MM-DD"
           />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="mb-4">
           <label className="block text-gray-700">Phone Number</label>
-          {/* <input
-              type="tel"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              required
-              minLength={10}
-              maxLength={10}
-              pattern="\d{10,}"
-              title="Enter a valid phone number with 10 digits."
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            /> */}
-
           <PhoneInput
             value={formData.phoneNumber}
             onChange={(phoneNumber) => { setFormData({ ...formData, phoneNumber }) }}
             required
-            minLength={10} // Minimum length required
-            maxLength={14} // Maximum length required
-            defaultCountry="US" // Set default country
-            // international
-            // countryCallingCodeEditable={false}
+            minLength={10}
+            maxLength={14}
+            defaultCountry="US"
             className="border w-full border-gray-300 mt-1 px-3 py-2 rounded-md shadow-sm !focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           />
         </div>
